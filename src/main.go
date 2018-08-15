@@ -6,11 +6,8 @@ package main
 
 #include "asr_api.h"
 #include <stdlib.h>
+#include <string.h>
 
-int print111(char* str)
-{
-  return strlen(str);
-}
 */
 import "C"
 import (
@@ -32,19 +29,25 @@ func initEngine() unsafe.Pointer {
 	fmt.Println("recognizer_getVersion: ", str1)
 
 	workpath1 := C.CString("/home/shhan/tw_model/")
+	defer C.free(unsafe.Pointer(workpath1))
 	ret2 := C.recognizer_setWorkPath(workpath1)
-	C.free(unsafe.Pointer(workpath1))
 	fmt.Println("recognizer_setWorkPath: ", ret2)
 
 	name1 := C.CString("ctc")
+	defer C.free(unsafe.Pointer(name1))
 	type1 := C.CString("dnn")
+	defer C.free(unsafe.Pointer(type1))
 	path1 := C.CString("/home/shhan/tw_model/model/final_0808_online.bin")
+	defer C.free(unsafe.Pointer(path1))
 	ret4 := C.recognizer_addAcoustic(name1, type1, path1, 0)
 	fmt.Println("recognizer_addAcoustic: ", ret4)
 
 	name2 := C.CString("first-path")
+	defer C.free(unsafe.Pointer(name2))
 	type2 := C.CString("wfst")
+	defer C.free(unsafe.Pointer(type2))
 	path2 := C.CString("/home/shhan/tw_model/model/xiaoi_hotword_test_0326_5.65e-9_ctc.dat")
+	defer C.free(unsafe.Pointer(path2))
 	ret5 := C.recognizer_addDecoder(name2, type2, path2)
 	fmt.Println("recognizer_addDecoder: ", ret5)
 
@@ -71,6 +74,7 @@ func initEngine() unsafe.Pointer {
 func recog(contextId1 unsafe.Pointer) string {
 	var sessionId unsafe.Pointer
 	ret := C.recognizer_createSession(&sessionId, contextId1, 16000);
+	defer C.recognizer_destroySession(sessionId)
 	fmt.Println("recognizer_createSession: ", ret)
 
 	ret2 := C.recognizer_startSession(sessionId, 0);
@@ -82,27 +86,23 @@ func recog(contextId1 unsafe.Pointer) string {
 	fmt.Println("recognizer_stopSession: ", ret3)
 
 	result1 := C.CString("")
+	defer C.free(unsafe.Pointer(result1))
 	ret4 := C.recognizer_getSessionResStr(sessionId, &result1);
 	fmt.Println("recognizer_getSessionResStr: ", ret4)
 
-	defer C.recognizer_destroySession(sessionId)
-	//fmt.Println("recognizer_destroySession: ",ret5)
-
-
-	size111:=C.print111(result1)
-	var resultA unsafe.Pointer =(unsafe.Pointer) (result1)
-	resultbb:=C.GoBytes(resultA, C.int(size111))
+	size111:=C.strlen(result1)
+	var resultA =(unsafe.Pointer) (result1)
+	resultbb:=C.GoBytes(resultA, (C.int)(size111))
 	return string(resultbb)
-
 	//return C.GoString(result1)
 }
 
 func resumeFile(sessionId unsafe.Pointer) {
-	f, error := os.Open("000000.wav")
+	var filename = os.Args[1]
+	f, error := os.Open(filename)
 	defer f.Close()
 	if error != nil {
-		fmt.Print("000000.wav not exist")
-		return
+		fmt.Print(filename," Open fail")
 	}
 
 	r := bufio.NewReader(f)
@@ -113,7 +113,8 @@ func resumeFile(sessionId unsafe.Pointer) {
 			break
 		}
 		b2 := (*C.uchar)(unsafe.Pointer(&b1[0]))
-		ret33 := C.recognizer_resumeSession(sessionId, b2, C.uint(lenl));
-		fmt.Println("recognizer_resumeSession: ", ret33)
+		//b2:=C.CBytes(b1)
+		C.recognizer_resumeSession(sessionId, (*C.uchar)(b2), C.uint(lenl));
+		//C.free(unsafe.Pointer(b2))
 	}
 }
