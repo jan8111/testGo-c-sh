@@ -1,0 +1,48 @@
+{
+  "work_path": "/home/shhan/tw_model/",
+  "dicPath": "",
+  "acoustics": [
+    {
+      "name": "ctc",
+      "path": "/home/shhan/tw_model/model/final_0808_online.bin",
+      "type": "dnn",
+      "device": 0
+    }
+  ],
+  "decoders": [
+    {
+      "name": "first-path",
+      "path": "/home/shhan/tw_model/model/xiaoi_hotword_test_0326_5.65e-9_ctc.dat",
+      "type": "wfst"
+    },
+    {
+      "name": "#HOT_WORD",
+      "path": "/home/shhan/tw_model/model/slot_info_0420/HOT_WORD.dat",
+      "type": "wfst"
+    }
+  ],
+  "shContexts": [
+    {
+      "acousticName": "ctc",
+      "contextCode": "CHN-CMN",
+      "bizMode": 0,
+      "univoiceAcousticParam": {
+        "cpu_batch_size": 40,
+        "sq_snr_estimate": 0,
+        "sq_clipping_dectect": 0
+      },
+      "contextDecoders": [
+        {
+          "decoderName": "first-path",
+          "bSlot": false
+        },
+        {
+          "decoderName": "#HOT_WORD",
+          "bSlot": true
+        }
+      ]
+    }
+
+
+  ]
+}
