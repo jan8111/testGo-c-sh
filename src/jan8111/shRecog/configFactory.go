@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 func buildConfig() SHConfigs{
-	bb, _ := ioutil.ReadFile("../resource/sh-config.json")
+	bb, _ := ioutil.ReadFile(os.Args[1])
 	var configs SHConfigs
 	err := json.Unmarshal(bb, &configs)
 	if err != nil {

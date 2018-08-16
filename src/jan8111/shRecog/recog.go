@@ -18,8 +18,8 @@ import (
 )
 
 func Main() {
-	if len(os.Args) <= 1 {
-		log.Fatalf("usage: ./testSh-Engine ../resource/000000.wav")
+	if len(os.Args) <= 2 {
+		log.Fatalf("usage: ./testSh-Engine 路径sh-config.json 路径000000.wav")
 	}
 
 	contextId1 := initEngine()
@@ -118,7 +118,7 @@ func recog(contextIds []unsafe.Pointer) {
 }
 
 func resumeFile(sessionId unsafe.Pointer) {
-	var filename = os.Args[1]
+	var filename = os.Args[2]
 	f, error := os.Open(filename)
 	defer f.Close()
 	if error != nil {
