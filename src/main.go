@@ -6,7 +6,6 @@ package main
 
 #include "asr_api.h"
 #include <stdlib.h>
-#include <string.h>
 
 */
 import "C"
@@ -85,16 +84,12 @@ func recog(contextId1 unsafe.Pointer) string {
 	ret3 := C.recognizer_stopSession(sessionId);
 	fmt.Println("recognizer_stopSession: ", ret3)
 
-	result1 := C.CString("")
-	defer C.free(unsafe.Pointer(result1))
-	ret4 := C.recognizer_getSessionResStr(sessionId, &result1);
-	fmt.Println("recognizer_getSessionResStr: ", ret4)
 
-	size111:=C.strlen(result1)
-	var resultA =(unsafe.Pointer) (result1)
-	resultbb:=C.GoBytes(resultA, (C.int)(size111))
-	return string(resultbb)
-	//return C.GoString(result1)
+	var resultptr unsafe.Pointer
+	result11 := (*C.char)(resultptr)
+	ret4 := C.recognizer_getSessionResStr(sessionId, &result11)
+	fmt.Println("recognizer_getSessionResStr: ", ret4)
+	return C.GoString(result11)
 }
 
 func resumeFile(sessionId unsafe.Pointer) {
