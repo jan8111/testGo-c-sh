@@ -12,24 +12,12 @@ import "C"
 import (
 	"fmt"
 	"unsafe"
-	"os"
-	"bufio"
-	"log"
 )
 
-func Main() {
-	if len(os.Args) <= 2 {
-		log.Fatalf("usage: ./testSh-Engine 路径sh-config.json 路径000000.wav")
-	}
-
-	contextId1 := initEngine()
-	recog(contextId1)
-
-}
 
 func initEngine() []unsafe.Pointer {
 	config := buildConfig()
-	fmt.Printf("config: %v \n",config)
+	fmt.Printf("config: %v \n", config)
 
 	ret := C.recognizer_getVersion()
 	str1 := C.GoString(ret)
@@ -70,7 +58,7 @@ func initEngine() []unsafe.Pointer {
 
 		AcousticName11 := C.CString(ShContexts1.AcousticName)
 		defer C.free(unsafe.Pointer(AcousticName11))
-		ret6 := C.recognizer_setContextAcoustic(contextId1,AcousticName11 )
+		ret6 := C.recognizer_setContextAcoustic(contextId1, AcousticName11)
 		fmt.Println("recognizer_setContextAcoustic: ", ret6)
 
 		param1 := new(C.UnivoiceAcousticParam)
@@ -83,7 +71,7 @@ func initEngine() []unsafe.Pointer {
 		for _, decoder1 := range ShContexts1.ContextDecoders {
 			DecoderName11 := C.CString(decoder1.DecoderName)
 			defer C.free(unsafe.Pointer(DecoderName11))
-			ret8 := C.recognizer_attachContextDecoder(contextId1,DecoderName11 , C._Bool(decoder1.BSlot))
+			ret8 := C.recognizer_attachContextDecoder(contextId1, DecoderName11, C._Bool(decoder1.BSlot))
 			fmt.Println("recognizer_attachContextDecoder: ", ret8)
 		}
 
@@ -93,48 +81,37 @@ func initEngine() []unsafe.Pointer {
 	return ret1
 }
 
-func recog(contextIds []unsafe.Pointer) {
-	for _, contextId1 := range contextIds {
+func recogStart(contextId1 unsafe.Pointer) unsafe.Pointer{
 		var sessionId unsafe.Pointer
 		ret := C.recognizer_createSession(&sessionId, contextId1, 16000);
-		defer C.recognizer_destroySession(sessionId)
 		fmt.Println("recognizer_createSession: ", ret)
 
 		ret2 := C.recognizer_startSession(sessionId, 0);
 		fmt.Println("recognizer_startSession: ", ret2)
 
-		resumeFile(sessionId)
-
-		ret3 := C.recognizer_stopSession(sessionId);
-		fmt.Println("recognizer_stopSession: ", ret3)
-
-		var resultptr unsafe.Pointer
-		result11 := (*C.char)(resultptr)
-		ret4 := C.recognizer_getSessionResStr(sessionId, &result11)
-		fmt.Println("recognizer_getSessionResStr: ", ret4)
-		resultStr := C.GoString(result11)
-		fmt.Println("result:", resultStr)
-	}
+		return sessionId
 }
 
-func resumeFile(sessionId unsafe.Pointer) {
-	var filename = os.Args[2]
-	f, error := os.Open(filename)
-	defer f.Close()
-	if error != nil {
-		fmt.Print(filename, " Open fail")
-	}
-
-	r := bufio.NewReader(f)
-	b1 := make([]byte, 3200)
-	for {
-		lenl, err := r.Read(b1)
-		if err != nil {
-			break
-		}
-		b2 := (*C.uchar)(unsafe.Pointer(&b1[0]))
-		//b2:=C.CBytes(b1)
-		C.recognizer_resumeSession(sessionId, (*C.uchar)(b2), C.uint(lenl));
-		//C.free(unsafe.Pointer(b2))
-	}
+func resumeFile(sessionId unsafe.Pointer, b1 []byte,len1 int) {
+	b2 := (*C.uchar)(unsafe.Pointer(&b1[0]))
+	//b2:=C.CBytes(b1)
+	ret2 := C.recognizer_resumeSession(sessionId, (*C.uchar)(b2), C.uint(len1))
+	fmt.Println("recognizer_resumeSession: ", ret2)
+	//C.free(unsafe.Pointer(b2))
 }
+
+func recogEnd(sessionId unsafe.Pointer) string{
+	defer C.recognizer_destroySession(sessionId)
+
+	ret3 := C.recognizer_stopSession(sessionId);
+	fmt.Println("recognizer_stopSession: ", ret3)
+
+	var resultptr unsafe.Pointer
+	result11 := (*C.char)(resultptr)
+	ret4 := C.recognizer_getSessionResStr(sessionId, &result11)
+	fmt.Println("recognizer_getSessionResStr: ", ret4)
+	resultStr := C.GoString(result11)
+	return resultStr
+}
+
+
