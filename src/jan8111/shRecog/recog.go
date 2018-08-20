@@ -2,7 +2,7 @@ package shRecog
 
 /*
 #cgo CFLAGS : -I../include
-#cgo LDFLAGS: -L/home/shhan/tw_model/deps -lrecognizer
+#cgo LDFLAGS: -lrecognizer
 
 #include "asr_api.h"
 #include <stdlib.h>
@@ -23,10 +23,10 @@ func initEngine() []unsafe.Pointer {
 	str1 := C.GoString(ret)
 	fmt.Println("recognizer_getVersion: ", str1)
 
-	workpath1 := C.CString(config.Work_path)
-	defer C.free(unsafe.Pointer(workpath1))
-	ret2 := C.recognizer_setWorkPath(workpath1)
-	fmt.Println(config.Work_path, " recognizer_setWorkPath: ", ret2)
+	//workpath1 := C.CString(config.Work_path)
+	//defer C.free(unsafe.Pointer(workpath1))
+	//ret2 := C.recognizer_setWorkPath(workpath1)
+	//fmt.Println(config.Work_path, " recognizer_setWorkPath: ", ret2)
 
 	for _, Acoustic1 := range config.Acoustics {
 		name1 := C.CString(Acoustic1.Name)

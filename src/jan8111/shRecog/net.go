@@ -13,6 +13,9 @@ var contextId11 []unsafe.Pointer
 func HelloServer(w http.ResponseWriter, req *http.Request) {
 	var bodySlc = make([]byte, 3200)
 
+	sampleRate:=req.Header.Get("sampleRate")
+	fmt.Printf("sampleRate: %s", sampleRate)
+
 	sessionId:=recogStart(contextId11[0])
 	for {
 		bodyLen, readErr := req.Body.Read(bodySlc)

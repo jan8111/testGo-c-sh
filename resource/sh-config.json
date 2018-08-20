@@ -1,10 +1,8 @@
 {
-  "work_path": "/home/shhan/tw_model/",
-  "dicPath": "",
   "acoustics": [
     {
       "name": "ctc",
-      "path": "/home/shhan/tw_model/model/final_0808_online.bin",
+      "path": "/home/user/ASR_Engine_8k/rail_2K_model/mix_ip_phv2_chn_08k_20190128_v1_asrq00_vadq08.bin",
       "type": "dnn",
       "device": 0
     }
@@ -12,12 +10,7 @@
   "decoders": [
     {
       "name": "first-path",
-      "path": "/home/shhan/tw_model/model/xiaoi_hotword_test_0326_5.65e-9_ctc.dat",
-      "type": "wfst"
-    },
-    {
-      "name": "#HOT_WORD",
-      "path": "/home/shhan/tw_model/model/slot_info_0420/HOT_WORD.dat",
+      "path": "/home/user/ASR_Engine_8k/rail_2K_model/mix_0523_8k_0.9_5.1e-9_0104_test_cmu.dat",
       "type": "wfst"
     }
   ],
@@ -35,10 +28,6 @@
         {
           "decoderName": "first-path",
           "bSlot": false
-        },
-        {
-          "decoderName": "#HOT_WORD",
-          "bSlot": true
         }
       ]
     }
