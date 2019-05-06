@@ -11,10 +11,10 @@ import (
 var contextId11 []unsafe.Pointer
 
 func HelloServer(w http.ResponseWriter, req *http.Request) {
-	var bodySlc = make([]byte, 3200)
+	var bodySlc = make([]byte, 160)
 
-	sampleRate:=req.Header.Get("sampleRate")
-	fmt.Printf("sampleRate: %s", sampleRate)
+	//sampleRate:=req.Header.Get("sampleRate")
+	//fmt.Printf("sampleRate: %s", sampleRate)
 
 	sessionId:=recogStart(contextId11[0])
 	for {
@@ -23,6 +23,7 @@ func HelloServer(w http.ResponseWriter, req *http.Request) {
 			fmt.Println("read body end",readErr)
 			break
 		} else {
+			//fmt.Println("resumeFile.bodyLen:",bodyLen)
 			resumeFile(sessionId,bodySlc,bodyLen)
 		}
 	}
@@ -33,10 +34,12 @@ func HelloServer(w http.ResponseWriter, req *http.Request) {
 
 func StartHttpServer() {
 	contextId11 = initEngine()
-	fmt.Println("initEngine end. contextId11: ",contextId11[0])
+	if contextId11[0]!=nil {
+		fmt.Println("initEngine success! ")
+	}
 
-	http.HandleFunc("/shRecBase/recog", HelloServer)
-	err := http.ListenAndServe(":8089", nil)
+	http.HandleFunc("/shCluster-worker/recog", HelloServer)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

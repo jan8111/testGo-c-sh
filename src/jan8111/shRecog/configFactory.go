@@ -42,6 +42,13 @@ type UnivoiceAcousticParam struct {
 	Sq_clipping_dectect int
 }
 
+type UnivoiceLicenseParam struct {
+	P_ServerIpAddr string
+	N_ServerPort int
+	I_BusinessType int
+	P_LocalIpAddr string
+}
+
 type ContextDecoder struct {
 	DecoderName string
 	BSlot bool
@@ -49,8 +56,7 @@ type ContextDecoder struct {
 }
 
 type SHConfigs struct {
-	Work_path  string
-	DicPath    string
+	UnivoiceLicenseParam UnivoiceLicenseParam
 	Acoustics  []Acoustic
 	Decoders   []Decoder
 	ShContexts []SHContext

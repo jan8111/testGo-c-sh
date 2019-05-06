@@ -1,4 +1,9 @@
 {
+  "univoiceLicenseParam": {
+    "p_ServerIpAddr": "61.164.186.228",
+    "n_ServerPort": 5566,
+    "p_LocalIpAddr":"172.16.8.151"
+  },
   "acoustics": [
     {
       "name": "ctc",
@@ -12,6 +17,11 @@
       "name": "first-path",
       "path": "/home/user/ASR_Engine_8k/rail_2K_model/mix_0523_8k_0.9_5.1e-9_0104_test_cmu.dat",
       "type": "wfst"
+    },
+    {
+      "name": "second-path",
+      "path": "/home/user/ASR_Engine_8k/rail_2K_model/mix_0523_8k_0.9_0107_test_cmu.bin",
+      "type": "wfst-compress"
     }
   ],
   "shContexts": [
@@ -27,7 +37,8 @@
       "contextDecoders": [
         {
           "decoderName": "first-path",
-          "bSlot": false
+          "bSlot": false,
+          "rescore": "second-path"
         }
       ]
     }

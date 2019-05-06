@@ -17,16 +17,26 @@ import (
 
 func initEngine() []unsafe.Pointer {
 	config := buildConfig()
-	fmt.Printf("config: %v \n", config)
+	//fmt.Printf("config: %v \n", config)
 
 	ret := C.recognizer_getVersion()
 	str1 := C.GoString(ret)
 	fmt.Println("recognizer_getVersion: ", str1)
 
-	//workpath1 := C.CString(config.Work_path)
-	//defer C.free(unsafe.Pointer(workpath1))
-	//ret2 := C.recognizer_setWorkPath(workpath1)
-	//fmt.Println(config.Work_path, " recognizer_setWorkPath: ", ret2)
+	licparam1 := new(C.UnivoiceLicenseParam)
+
+	str111 := C.CString(config.UnivoiceLicenseParam.P_ServerIpAddr)
+	defer C.free(unsafe.Pointer(str111))
+	str11122 := C.CString(config.UnivoiceLicenseParam.P_LocalIpAddr)
+	defer C.free(unsafe.Pointer(str11122))
+	(*licparam1).p_ServerIpAddr = (*C.uchar)(unsafe.Pointer(str111))
+	(*licparam1).n_ServerIpAddrLen = C.uint( len(config.UnivoiceLicenseParam.P_ServerIpAddr))
+	(*licparam1).n_ServerPort = C.ushort(config.UnivoiceLicenseParam.N_ServerPort)
+	(*licparam1).p_LocalIpAddr = (*C.uchar)(unsafe.Pointer(str11122))
+	(*licparam1).n_LocalIpAddrLen = C.uint(len(config.UnivoiceLicenseParam.P_LocalIpAddr))
+	(*licparam1).i_BusinessType = 1
+	ret77 := C.recognizer_init(licparam1)
+	fmt.Println(config.UnivoiceLicenseParam,"recognizer_init: ", ret77)
 
 	for _, Acoustic1 := range config.Acoustics {
 		name1 := C.CString(Acoustic1.Name)
@@ -73,6 +83,13 @@ func initEngine() []unsafe.Pointer {
 			defer C.free(unsafe.Pointer(DecoderName11))
 			ret8 := C.recognizer_attachContextDecoder(contextId1, DecoderName11, C._Bool(decoder1.BSlot))
 			fmt.Println("recognizer_attachContextDecoder: ", ret8)
+
+			if decoder1.Rescore!="" {
+				recoredname11 := C.CString(decoder1.Rescore)
+				defer C.free(unsafe.Pointer(recoredname11))
+				ret88 := C.recognizer_setContextRescore(contextId1, DecoderName11, recoredname11)
+				fmt.Println("recognizer_setContextRescore. ", ret88)
+			}
 		}
 
 		ret1[i] = contextId1
@@ -83,7 +100,7 @@ func initEngine() []unsafe.Pointer {
 
 func recogStart(contextId1 unsafe.Pointer) unsafe.Pointer{
 		var sessionId unsafe.Pointer
-		ret := C.recognizer_createSession(&sessionId, contextId1, 16000);
+		ret := C.recognizer_createSession(&sessionId, contextId1, 8000);
 		fmt.Println("recognizer_createSession: ", ret)
 
 		ret2 := C.recognizer_startSession(sessionId, 0);
@@ -95,8 +112,8 @@ func recogStart(contextId1 unsafe.Pointer) unsafe.Pointer{
 func resumeFile(sessionId unsafe.Pointer, b1 []byte,len1 int) {
 	b2 := (*C.uchar)(unsafe.Pointer(&b1[0]))
 	//b2:=C.CBytes(b1)
-	ret2 := C.recognizer_resumeSession(sessionId, (*C.uchar)(b2), C.uint(len1))
-	fmt.Println("recognizer_resumeSession: ", ret2)
+	C.recognizer_resumeSession(sessionId, (*C.uchar)(b2), C.uint(len1))
+	//fmt.Println("recognizer_resumeSession: ", ret2)
 	//C.free(unsafe.Pointer(b2))
 }
 
