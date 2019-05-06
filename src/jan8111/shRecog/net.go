@@ -16,6 +16,7 @@ func HelloServer(w http.ResponseWriter, req *http.Request) {
 	//sampleRate:=req.Header.Get("sampleRate")
 	//fmt.Printf("sampleRate: %s", sampleRate)
 
+	//todo find by contextCode
 	sessionId:=recogStart(contextId11[0])
 	for {
 		bodyLen, readErr := req.Body.Read(bodySlc)
@@ -34,11 +35,9 @@ func HelloServer(w http.ResponseWriter, req *http.Request) {
 
 func StartHttpServer() {
 	contextId11 = initEngine()
-	if contextId11[0]!=nil {
-		fmt.Println("initEngine success! ")
-	}
+	fmt.Println("initEngine result: ",contextId11)
 
-	http.HandleFunc("/shCluster-worker/recog", HelloServer)
+	http.HandleFunc("/ivs/recog", HelloServer)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

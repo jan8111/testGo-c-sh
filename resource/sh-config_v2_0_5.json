@@ -1,0 +1,80 @@
+{
+  "univoiceLicenseParam": {
+    "p_ServerIpAddr": "172.16.8.103",
+    "n_ServerPort": 5566,
+    "p_LocalIpAddr":"172.16.8.103"
+  },
+  "acoustics": [
+    {
+      "name": "mix220",
+      "path": "/home/user/2.0.5_mkl/model/mix_cc_phv2_m_chn_08k_20190315_v1_asrq00_vadq08.bin",
+      "type": "dnn",
+      "device": 0
+    }
+  ],
+  "decoders": [
+    {
+      "name": "first-path",
+      "path": "/home/user/2.0.5_mkl/model/mix_total_num_8k_0.8_2.85e-9_0429_cmu.dat",
+      "type": "wfst"
+    },
+    {
+      "name": "second-path",
+      "path": "/home/user/2.0.5_mkl/model/mix_total_num_8k_0.8_0429_cmu.bin",
+      "type": "wfst-compress"
+    },
+    {
+      "name": "#SH_INT_NUM",
+      "path": "/home/user/2.0.5_mkl/model/slot/int_num.dat",
+      "type": "wfst"
+    },
+    {
+      "name": "#SH_EN_NUM",
+      "path": "/home/user/2.0.5_mkl/model/slot/en_num.dat",
+      "type": "wfst"
+    },
+    {
+      "name": "#SH_FLOAT_NUM",
+      "path": "/home/user/2.0.5_mkl/model/slot/float_num.dat",
+      "type": "wfst"
+    }
+
+  ],
+  "shContexts": [
+    {
+      "acousticName": "mix220",
+      "contextCode": "code1",
+      "bizMode": 0,
+      "univoiceAcousticParam": {
+        "cpu_batch_size": 8,
+        "sq_snr_estimate": 0,
+        "sq_clipping_dectect": 0
+      },
+      "contextDecoders": [
+        {
+          "decoderName": "first-path",
+          "bSlot": false,
+          "rescore": "second-path",
+          "weight": 0
+        },
+        {
+          "decoderName": "#SH_INT_NUM",
+          "bSlot": true,
+          "weight": 0
+        },
+        {
+          "decoderName": "#SH_EN_NUM",
+          "bSlot": true,
+          "weight": 0
+        },
+        {
+          "decoderName": "#SH_FLOAT_NUM",
+          "bSlot": true,
+          "weight": 0
+        }
+      ]
+    }
+
+
+  ]
+}

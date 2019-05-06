@@ -17,7 +17,7 @@ import (
 
 func initEngine() []unsafe.Pointer {
 	config := buildConfig()
-	//fmt.Printf("config: %v \n", config)
+	fmt.Printf("config: %v \n", config)
 
 	ret := C.recognizer_getVersion()
 	str1 := C.GoString(ret)
@@ -69,26 +69,26 @@ func initEngine() []unsafe.Pointer {
 		AcousticName11 := C.CString(ShContexts1.AcousticName)
 		defer C.free(unsafe.Pointer(AcousticName11))
 		ret6 := C.recognizer_setContextAcoustic(contextId1, AcousticName11)
-		fmt.Println("recognizer_setContextAcoustic: ", ret6)
+		fmt.Println(ShContexts1.AcousticName,"recognizer_setContextAcoustic: ", ret6)
 
 		param1 := new(C.UnivoiceAcousticParam)
 		(*param1).cpu_batch_size = C.int(ShContexts1.UnivoiceAcousticParam.Cpu_batch_size)
 		(*param1).sq_snr_estimate = C.int(ShContexts1.UnivoiceAcousticParam.Sq_snr_estimate)
 		(*param1).sq_clipping_dectect = C.int(ShContexts1.UnivoiceAcousticParam.Sq_clipping_dectect)
 		ret7 := C.recognizer_setContextAcousticParam(contextId1, param1)
-		fmt.Println("recognizer_setContextAcousticParam: ", ret7)
+		fmt.Println(ShContexts1.UnivoiceAcousticParam,"recognizer_setContextAcousticParam: ", ret7)
 
 		for _, decoder1 := range ShContexts1.ContextDecoders {
 			DecoderName11 := C.CString(decoder1.DecoderName)
 			defer C.free(unsafe.Pointer(DecoderName11))
-			ret8 := C.recognizer_attachContextDecoder(contextId1, DecoderName11, C._Bool(decoder1.BSlot))
-			fmt.Println("recognizer_attachContextDecoder: ", ret8)
+			ret8 := C.recognizer_attachContextDecoder(contextId1, DecoderName11, C._Bool(decoder1.BSlot),C.float(decoder1.Weight))
+			fmt.Println(decoder1.DecoderName,decoder1.Weight,"recognizer_attachContextDecoder: ", ret8)
 
 			if decoder1.Rescore!="" {
 				recoredname11 := C.CString(decoder1.Rescore)
 				defer C.free(unsafe.Pointer(recoredname11))
 				ret88 := C.recognizer_setContextRescore(contextId1, DecoderName11, recoredname11)
-				fmt.Println("recognizer_setContextRescore. ", ret88)
+				fmt.Println(decoder1.Rescore,"recognizer_setContextRescore. ", ret88)
 			}
 		}
 
@@ -120,7 +120,7 @@ func resumeFile(sessionId unsafe.Pointer, b1 []byte,len1 int) {
 func recogEnd(sessionId unsafe.Pointer) string{
 	defer C.recognizer_destroySession(sessionId)
 
-	ret3 := C.recognizer_stopSession(sessionId);
+	ret3 := C.recognizer_stopSession(sessionId,C._Bool(false));
 	fmt.Println("recognizer_stopSession: ", ret3)
 
 	var resultptr unsafe.Pointer

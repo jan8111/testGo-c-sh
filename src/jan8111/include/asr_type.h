@@ -65,6 +65,9 @@ typedef enum
     RECOGNIZER_DECODER_IN_USE = -13,
     RECOGNIZER_OUT_OF_DATE = -14,
     RECOGNIZER_NO_LICENSEACCREDIT = -15,
+    RECOGNIZER_MODEL_NOT_COMPATIBLE = -16,
+    RECOGNIZER_ABORT = -17,
+    RECOGNIZER_NOT_ACTIVATE = -18,
 } RecogRetCode;
 
 typedef enum
@@ -78,14 +81,25 @@ typedef enum
 
 typedef enum
 {
+    AcousticInfoSampleRate = 0, /* UInt32, 
+                                    sample rate */
+    
+    AcousticInfoStrideSamples = 1, /* UInt32, 
+                                    frame stride samples, 
+                                    Usually this value is 160 for sample rate is 16k, 
+                                    and 80 for sample rate is 8k*/
+} AcousticInfo;
+
+typedef enum
+{
     kWfstUnknown  = 0,    //unused
     kWfst         = 1,    //for decoder and rescore
     kWfstCompress = 2,    //only for rescore
     kBnf          = 3,    //only for slot
-    kListLine     = 4,    //only for slot
-    kListJson     = 5,    //only for slot
-//    kListXml      = 6,    //only for slot
-	kListJsonMem  = 7,    //only for slot
+    kListLine     = 4,
+    kListJson     = 5,
+//    kListXml      = 6,    
+	kListJsonMem  = 7,
 } WfstType;
 
 typedef struct Univoice_Acoustic_Param
@@ -112,19 +126,20 @@ typedef struct Univoice_Decoder_Param
     Int32   genPartialFrame;
     Int32   debug;
     Float32 blankSkip;
+	Int32   digitalMode;        // 0 - null mode; 1 - number mode; 2 - text mode
 } UnivoiceDecoderParam;
 
 typedef struct Univoice_Vad_Param
 {
-    Int32 vad_type;                     // 0: no vad
-                                        // 1: vad_mode_1 (advanced, more accurate but more calculations), 
-                                        // 2: vad_mode_2 (legacy)
-                                        
+    Int32 use_vad;                      // 0: do not use vad, otherwise use vad
+    Int32 vad_long_rec;                 // 0: short voice recognize, otherwise long voice recognize
     Float32 vad_threshold;              // default: 0.5
-    Int32 vad_ms_lead_sil_timeout;      // default: 5000 ms(only for vad_mode_1)
-    Int32 vad_ms_beg_acc_sph;           // default: 100 ms for vad_mode_1; 200 ms for vad_mode_2
-    Int32 vad_ms_beg_acc_sph_lead_sil;  // default: 600 ms(only for vad_mode_1) 
-    Int32 vad_ms_end_cont_sie;          // default: 1000 ms for vad_mode_1; 500 ms for vad_mode_2
+    Float32 vad_energyweight;           // default: 0.5
+    Int32 vad_ms_mini_speech;           // default: 0ms
+    Int32 vad_ms_lead_sil_timeout;      // default: 5000 ms
+    Int32 vad_ms_beg_acc_sph;           // default: 100 ms
+    Int32 vad_ms_beg_acc_sph_lead_sil;  // default: 600 ms
+    Int32 vad_ms_end_cont_sie;          // default: 1000
 } UnivoiceVadParam;
 
 typedef enum E_Vad_Event_Tag
@@ -134,6 +149,7 @@ typedef enum E_Vad_Event_Tag
     E_Vad_Event_Bos,                        // begin of speech
     E_Vad_Event_Eos,                        // end of speech
     E_Vad_Event_Over,                       // already have E_Vad_Event_Lst or E_Vad_Event_Eos, push wav continuously, you will get E_Vad_Event_Over
+    E_Vad_Event_Head,                       // for inner use
 } E_Vad_Event;
 
 typedef struct Univoice_License_Param
@@ -145,7 +161,6 @@ typedef struct Univoice_License_Param
     UInt32 n_LocalIpAddrLen;                // the length of local ip address
     Int32 i_BusinessType;                   // business type
 } UnivoiceLicenseParam;
-
 
 // log level
 enum Log_Priority { LOG_INFO = 1, LOG_WARNING, LOG_ERROR, LOG_USER };

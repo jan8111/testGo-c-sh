@@ -53,6 +53,7 @@ type ContextDecoder struct {
 	DecoderName string
 	BSlot bool
 	Rescore string
+	Weight float32
 }
 
 type SHConfigs struct {
